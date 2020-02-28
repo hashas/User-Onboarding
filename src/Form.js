@@ -8,10 +8,10 @@ function LoginForm({ values, errors, touched, isSubmitting }) {
     return (
         <Form>
             <div>
-                <Field type="fname" name="fname" placeholder="First Name" />
+                <Field type="text" name="fname" placeholder="First Name" />
             </div>
             <div>
-                <Field type="lname" name="lname" placeholder="Last Name" />
+                <Field type="text" name="lname" placeholder="Last Name" />
             </div>
             <div>
                 <Field type="email" name="email" placeholder="Email" />
@@ -28,23 +28,29 @@ function LoginForm({ values, errors, touched, isSubmitting }) {
 }
 
 const FormikLoginForm = withFormik({
-    mapPropsToValues({ name, email, password, tos }) {
+    mapPropsToValues({ fname, lname, email, password, tos }) {
         return {
-            name: name || "",
+            fname: fname || "",
+            lname: lname || "",
             email: email || "",
             password: password || "",
             tos: tos || false
         };
     },
     validationSchema: Yup.object().shape({
-        name: Yup.string()
-            .required("Name is required"),
+        fname: Yup.string()
+            .required("First name is required"),
+        lname: Yup.string()
+            .required("Last name is required"),    
         email: Yup.string()
             .email("Email not valid")
             .required("Email is required"),
         password: Yup.string()
         .min(8, "Password must be 8 characters or longer")
-        .required("Password is required" )
+        .required("Password is required" ),
+        tos: Yup.boolean()
+        .oneOf([true], "You must accept the terms to use the service")
+        .required("This field is required")
     }),
     handleSubmit(values, { resetForm, setErrors, setSubmitting }) {
         if (values.email === "alreadytaken@atb.dev") {
