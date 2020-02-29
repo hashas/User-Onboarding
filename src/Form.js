@@ -1,28 +1,38 @@
-import React from 'react';
-import ReactDOM from "react-dom";
+import React, {useState} from 'react';
+// import ReactDOM from "react-dom";
 import { withFormik, Form, Field } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 
-function LoginForm({ values, errors, touched, isSubmitting }) {
+// const [users, setUsers] = useState([]);
+
+function LoginForm(props) {
+    console.log(props)
+    // const {values, errors, touched} = props;
     return (
         <Form>
             <div>
+                {props.touched.fname && props.errors.fname && <p>{props.errors.fname}</p>}
                 <Field type="text" name="fname" placeholder="First Name" />
             </div>
             <div>
+                {props.touched.lname && props.errors.lname && <p>{props.errors.lname}</p>}
                 <Field type="text" name="lname" placeholder="Last Name" />
             </div>
             <div>
+                {props.touched.email && props.errors.email && <p>{props.errors.email}</p>}
                 <Field type="email" name="email" placeholder="Email" />
             </div>
             <div>
+                {props.touched.password && props.errors.password && <p>{props.errors.password}</p>}
                 <Field type="password" name="password" placeholder="Password" />
             </div>
             <label>
-                <Field type="checkbox" name="tos" checked={values.tos} />
+                {props.touched.tos && props.errors.tos && <p>{props.errors.tos}</p>}
+                <Field type="checkbox" name="tos" checked={props.values.tos} />
+                Accept TOS
             </label>
-            <button disabled={isSubmitting}>Submit!</button>
+            <button type="submit" disabled={props.isSubmitting}>Submit!</button>
         </Form>
     );
 }
@@ -52,26 +62,26 @@ const FormikLoginForm = withFormik({
         .oneOf([true], "You must accept the terms to use the service")
         .required("This field is required")
     }),
-    handleSubmit(values, { resetForm, setErrors, setSubmitting }) {
-        if (values.email === "alreadytaken@atb.dev") {
-            setErrors({ email: "That email is already taken" });
+    handleSubmit(values, tools) {
+        if (values.email === "waffle@syrup.com") {
+            tools.setErrors({ email: "That email is already taken" });
         } else {
             axios
                 .post("https://reqres.in/api/users", values)
                 .then(res => {
+                    console.log('succesful submit')
                     console.log(res); // Data was created successfully and logs to complete
-                    resetForm();
-                    setSubmitting(false);
+                    tools.props.setUsers([...tools.props.users, res.data])
+                    // tools.setStatus(res.data);
+                    tools.resetForm();
+                    tools.setSubmitting(false);
                 })
                 .catch(err => {
                     console.log(err); // There was an error creating the data and logs to console
-                    setSubmitting(false);
+                    tools.setSubmitting(false);
                 });
         }
     }
-
-
-
 })(LoginForm);
 
-export defualt FormikLoginForm;
+export default FormikLoginForm;
